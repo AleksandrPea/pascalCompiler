@@ -1,50 +1,49 @@
 # pascalCompiler
-<h2>Опис мови програмування</h2>
+## Language description
+Created programming language(that is very similar to Pascal) has 4 data types: **integer**(32 bit), **float**(64 bit), **boolean** and **string**. This language is strongly-typed. For example statement ``` float a := 3 ``` has error, because 3 is integer constant.
 
-Створена мова програмування(яка є дуже подібною до мови Pascal) має 4 типи даних: цілочисельний(integer, 32 біт), з плаваючою точкою(float, 64 біт), булевий(boolean) та рядковий(string). Ця мова – строго типізована, де float a := 3 це помилка, бо 3 – це константа цілочисельного типу.
+Also this language is case-sensitive.
 
-Також ця мова є регістро-залежною.
+Grammar of input language has next **lexemes**: "program", "var", "integer", float", "boolean", "string", "if", "then", "else","begin", "end", "while", "do", "for", "to", "repeat", "until", "true", "false", "or", "and", "div", "mod", "not" та ‘;’ ‘:’ ‘,’ ‘.’ ‘(’ ‘)’ ‘[‘ ‘]’ ‘=’ ‘< >’ ‘<’ ‘>’ ‘<=’ ‘>=’ ‘*’ ‘/’ ‘+’ ‘-‘ ‘:=’ ‘ ’.
 
-Граматика вхідної мови містить наступні лексеми: "program", "var","integer", float","boolean","string", "if", "then", "else","begin", "end", "while", "do", "for", "to", "repeat", "until","true", "false", "or", "and", "div", "mod", "not" та ‘;’ ‘:’ ‘,’ ‘.’ ‘(’ ‘)’ ‘[‘ ‘]’ ‘=’ ‘< >’ ‘<’ ‘>’ ‘<=’ ‘>=’ ‘*’ ‘/’ ‘+’ ‘-‘ ‘:=’ ‘ ’ ’.
-
-У мові реалізовані 3 цикли(for, з перед-умовою, пост-умовою). Приклад циклу for:
-
+There are 3 types of **cycles** realized: for-do, repeat-untile, while-do. Here is example:
+```
 for i := 1 to 4 do begin … end;
+```
+Starting and ending indices can't be variables.
 
-Початковий індекс та кінцевий не можуть бути змінними.
+There are arithmetic operators for integer and float types: *sum(+), subtract(-), dividing(div or /), multiplying(*), getting remainder(mod - only for integer), unary operators + and -; all possible comparison operations*. For boolean type next logical operators are realized: *OR, AND, NOT*. Additionally there are statements: *float:sqrt(float), printFloat(float), printInteger(integer), printBoolean(boolean), print(string), println(string).*
 
-Для integer та float реалізовані наступні арифметичні операції : додавання(+), віднімання(-), ділення(div та / відповідно), множення(*), отримання залишку(mod - тільки для цілочисельного типу), унарні операції + та -; всі можливі операції порівняння. Для boolean реалізовані логічні операції : АБО, І, НЕ. Додатково до цього підтримуються оператори: float:sqrt(float), printFloat(float), printInteger(integer), printBoolean(boolean), print(string), println(string).
+## Lexical analyzer
+Lexical analyzer is built by setting [left regular grammar](https://en.wikipedia.org/wiki/Regular_grammar) that is programmatically converted to appropriate [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine). Thus *lexical analyzer generator* is created(class **LexicalAnalyzer**) which at the entrance accepts: left regular grammar represented by object of class **RegularGrammar**, arrays of delimiters and keywords. The main constraint imposed on grammar is exclusioning rules with same right side.
 
-<h2>Лексичний аналізатор</h2>
-Лексичний аналізатор побудований за допомогою задання ліволінійної автоматної граматики, яка програмно перетворюється у відповідний детермінований кінцевий автомат. Таким чином, у даній роботі розроблений <i>генератор лексичних аналізаторів</i>(клас <b>LexicalAnalyzer</b>), який на вході приймає лівонійну регулярну граматику у вигляді об’єкту класу <b>RegularGrammar</b>, масиви роздільників та ключових слів. Головне обмеження, яке накладається на граматику, це виключення правил з однаковою правою частиною.
+Setting grammar for Pascal lexemes(not all) you can find in class **PascalAnalyzer**.
 
-Код задання граматики лексем для мови Pascal, яка не є вичерпною, можна знайти в класі <b>PascalAnalyzer</b>.
+## Syntactic analyzer(Parser)
+Syntactic analyzer is built by setting [LL(1) grammar](https://en.wikipedia.org/wiki/LL_grammar)(class **Grammar**). LL(1) grammar can have rules of the next form: A -> α | ε, where α – any sequence of terminals and nonterminals, ε - empty symbol. Thus *descending syntactic analyzer generator* is created(class **Parser**). For input grammar these are not allowed:
 
-<h2>Синтаксичний аналізатор</h2>
-Синтаксичний аналізатор побудований за допомогою задання LL(1) граматики(клас <b>Grammar</b>). LL(1) граматика може містити правила виду: A -> α | ε, де α – будь-яка послідовність терміналів та нетерміналів, ε – пустий символ. Таким чином, у даній роботі розроблений <i>генератор низхідних синтаксичних аналізаторів</i>(клас <b>Parser</b>). Для вхідної граматики не дозволяються:
+- rules with left recursion;
+- rules having at least one same first-symbol. For example A -> a | aB.
 
-- правила з лівою рекурсією;
-- правила, що мають хоча б один однаковий first-символ. Наприклад A -> a | aB.
+For each LL(1) grammar you can build [pushdown automaton](https://en.wikipedia.org/wiki/Pushdown_automaton) that has memory(stack) and recognises sentential forms of described language.
 
-Для кожної LL(1) граматики можна побудувати детермінований автомат с пам’яттю(стеком), що розпізнає сентенційні форми мови, яку описує граматика.
+By storing rules, that are used in parsing, parse tree is built(using class **Node**).
 
-За рахунок запам’ятовування правил, які були використані при синтаксичному розборі, будується дерево розбору(клас <b>Node</b>).
+Setting grammar for Pascal syntactic constructions(not all) you can find in class **PascalParser**.
 
-Код задання синтаксичних конструкцій для мови Pascal, яка не є вичерпною, можна знайти в класі <b>PascalParser</b>.
+## Semantic analyzer
+For this purpose simple classes are created. They represent some syntactic constructions(for example BinaryOp). Also converting parse tree to abstract syntactic tree(AST) is programmed.
 
-<h2>Cемантичний аналізатор</h2>
-Створені прості класи, які відображають певні синтаксичні конструкції(наприклад BinaryOp) та запрограмоване перетворення дерева розбору в абстрактне синтаксичне дерево(AST).
+Concrete implementation of interface **AstVisitor** - **TypeChecker** is the semantic analyzer. Input arguments are: root of AST and table of operator types in form of object of class **OperatorTable**. In the method visit( ): types of argumets and variables(was it declared) are checked; loop and if operators, which has boolean constant as condition, are found.
 
-Також створена конкретна реалізація інтерфейсу <b>AstVisitor</b> – <b>TypeChecker</b>, який і є семантичним аналізатором. Вхідними даними для нього є : вершина дерева AST, та таблиця операторних типів у вигляді об’єкту класу <b>OperatorTable</b>. У методах visit( ) перевіряються типи аргументів операторів, змінні(чи була оголошена) та розшукуються даремні цикли та if-и, що за умову мають булеву константу(true або false).
+As a result of semantic analyzer work is *table of variables*, which includes each declared variable and its type.
 
-Як результат роботи семантичного аналізатора в даній роботі це таблиця змінних, що для кожної оголошеної змінної містить її тип.
+## Intermediate code generator
+Generator **IrGenerator** is concrete implementation of **AstVisitor** and its main target is converting parse tree to more specific *list of intermediate commands*. Beside this, it supplements early created *table of variables* with new temporary variables.
 
-<h2>Генератор проміжного коду</h2>
-Генератор <b>IrGenerator</b> являється конкретною реалізацією <b>AstVisitor</b> і його головним завданням є перетворення дерева синтаксичних контрукцій у більш конкретний список проміжних команд. Окрім цього, він доповнює створену раніше таблицю змінних новими тимчасовими(temp) змінними.
+## Target code(asm) generator
+Target code generator is represented by class **IA32CodeGenerator**, which uses concrete implementation of interface **IrVisitor** - **IA32ProgramVisitor**. Its main target is constructing program in form of list of assembler strings. Input arguments are *table of variables* and *list of intermediate commands*.
 
-<h2>Генератор цільового(asm) коду</h2>
-Генератор цільового коду в даній роботі є <b>IA32CodeGenerator</b>, який використовує конкретну реалізацію інтерфейсу <b>IrVisitor</b> – <b>IA32ProgramVisitor</b>. Його завданням є побудова програми на masm у вигляді списку рядків. Вхідними даними є таблиця змінних та список проміжних команд.
+Also **IA32Operators** class is used in this generator. It describes transformations of all standard operators from class **StandardTypes**. Additionally this class allows for each named operator type(object of class **NamedType**) mapping specified object of class **IA32Operator**, which has method for code generation, or inform that there is no mapping.
 
-Окрім цього <b>IA32ProgramVisitor</b> використовує клас <b>IA32Operators</b>, який є ключовим. В ньому описані перетворення всіх стандартних операторів з класу <b>StandardTypes</b>. Також цей клас для кожного іменованого операторного типу(об’єкт <b>NamedType</b>) може поставити у відповідність певний об’єкт типу <b>IA32Operator</b>, який має метод для генерації коду, або сповістити, що такої відповідності немає.
-
-Цільова програма може бути скомпільовна у виконуємий файл на комп’ютерах з архітектурою IA32.
+Target program could be compiled to .exe file on the computers with IA32 architecture.
